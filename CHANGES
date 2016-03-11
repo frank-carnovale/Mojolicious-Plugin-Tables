@@ -1,0 +1,18 @@
+commit 4da2adbb3881bdcbe171f42fd822a9ece81516d8
+Merge: 817e7f2 b33d1e4
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Mar 11 02:05:52 2016 +0000
+
+    Merge branch 'master' of github.com:frank-carnovale/Mojolicious-Plugin-Tables
+
+commit 817e7f288fada01eca5a736f5df0c4fc2c0e66b2
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Mar 11 02:03:54 2016 +0000
+
+    commit the first
+
+commit b33d1e484f3d244e661f49e7354033a7d6c9bb97
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Fri Mar 11 01:59:10 2016 +0000
+
+    Initial commit
