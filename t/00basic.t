@@ -21,16 +21,7 @@ $t->get_ok('/tables'                => 'tables page exists');
 $t->text_is('button[table=artist]', 'Artist'
                                     => 'list of tables includes button for Artist');
 
-$t->get_ok('/tables/artist.json'    => 'Artist json query succeeds');
-
-#note "GOT",  explain $t->tx->res->json;
-
-$t->json_has('/data'                => 'json response has data');
-$t->json_is('/data/1/name', 'Michael Jackson',
-                                    => 'data includes Michael Jackson');
-
 $t->get_ok('/tables/artist/1/view'  => 'Row view page appears');
-
 $t->text_is('a[href=/tables/cd/2/view]', '[Cd] 2',
                                     => 'Linkable Child row appears');
 

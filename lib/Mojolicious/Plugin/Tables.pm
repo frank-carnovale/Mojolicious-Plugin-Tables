@@ -6,7 +6,7 @@ use File::Spec::Functions 'catdir';
 
 use Mojolicious::Plugin::Tables::Model;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub register {
     my ($self, $app, $conf) = @_;
@@ -36,16 +36,36 @@ sub register {
 
     $app->config(default_theme=>'redmond');
     $app->defaults(layout=>'tables');
-    
+
     my $model_class = $conf->{model_class} ||= 'Mojolicious::Plugin::Tables::Model';
-    $model_class->log($log);
     my $model       = $model_class->setup($conf);
+    $model_class->log($log);
     $app->config(model=>$model);
 
     my $plugin_resources = catdir dirname(__FILE__), 'Tables', 'resources';
     push @{$app->routes->namespaces}, 'Mojolicious::Plugin::Tables::Controller';
     push @{$app->renderer->paths}, catdir($plugin_resources, 'templates');
     push @{$app->static->paths},   catdir($plugin_resources, 'public');
+
+    # Arrange for custom table-specific template overrides, when present.
+    # We do this by wrapping the standard ep-handler with a
+    # pre-processor to test for existence of the custom template.
+    # Any internal caching by EP renderer is preserved even for overrides.
+
+    my $handlers = $app->renderer->handlers;
+    my $base_ep  = $handlers->{ep};
+    $handlers->{ep} = sub {
+        my ($renderer, $c, $output, $options) = @_;
+        {
+            my $table           = $c->stash('table') || last;
+            my $custom_template = "$table/$options->{template}";
+            my $custom_path     = $renderer->template_path ({%$options,
+                                             template=>$custom_template}) || last;
+            $options->{template} = $custom_template;
+            $log->debug("custom 'tables' template at $custom_path") if $ENV{TABLES_DEBUG};
+        }
+        $base_ep->(@_)
+    };
 
     my $r = $app->routes;
     $r->get('/' => sub{shift->redirect_to('tables')}) unless $conf->{nohome};
@@ -122,9 +142,9 @@ specialised look and feel.
 
 =head1 STATUS
 
-This is a first release.  Guides and more override-hooks coming Real Soon Now.
+This is an early release.  Guides and more override-hooks coming Real Soon Now.
 
-=head1 REFERENCE
+=head1 GROWTH PATH
 
 =head2 Ground Zero Startup
 
@@ -140,6 +160,18 @@ In your Mojolicious 'startup'..
     $self->plugin(Tables => { connect_info => [ connect-param, connect-param, .. ] };
 
 Add this line to a new Mojolicious app then run it using any Mojo-based server (morbo, prefork, hypnotoad..) to achieve exactly the same functionality as the 'tables' script.
+
+=head2 Day Two
+
+    # templates/:table/{view,edit,dml,page,view}.html.ep
+    # e.g. 
+    # templates/artist/view.html.ep
+    <h1>Artist: <%= $row %></h1>
+
+For any :table in your database, create override-templates as required.
+e.g. The above code will give a very different look-and-feel when viewing a single Artist, but all other
+pages are unchanged.  For better examples and to see which stash-variables are available, start by 
+copying the distribution templates from ../Plugin/Tables/resources/templates into your own template area.
 
 =head2 Infinity and Beyond
 

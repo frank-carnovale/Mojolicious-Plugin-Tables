@@ -11,7 +11,7 @@
 
 % for my $column (@{$tinfo->{columns}}) {
     % my $cinfo = $bycolumn->{$column};
-    % $c->app->log->debug("$dml_mode $column: [" . (param($column)||'(empty)') . "]" . $c->dumper($cinfo));
+    % $c->app->log->debug("$dml_mode $column: [" . (param($column)||'(empty)') . "]" . $c->dumper($cinfo)) if $ENV{TABLES_DEBUG};
     % my $fkey  = $cinfo->{fkey};          # means this is a m-1 parent entry..
     % next if $fkey && $bycolumn->{$fkey}; # which will be reported with the fkey itself
     % my $val;
