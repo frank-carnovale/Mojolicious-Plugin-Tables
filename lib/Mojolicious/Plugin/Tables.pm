@@ -163,7 +163,7 @@ Add this line to a new Mojolicious app then run it using any Mojo-based server (
 
 =head2 Day Two
 
-    # templates/:table/{view,edit,dml,page,view}.html.ep
+    # templates/:table/{view,edit,dml,page}.html.ep
     # e.g. 
     # templates/artist/view.html.ep
     <h1>Artist: <%= $row %></h1>
