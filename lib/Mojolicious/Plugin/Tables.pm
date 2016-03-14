@@ -313,6 +313,10 @@ all child records and finally delete $self.  Override this to prohibit (by diein
 
 Of course, all the methods described at L<DBIx::Class::Row> can be overriden here.
 
+=head1 DEBUGGING
+
+To generate detailed trace info into the server log, export TABLES_DEBUG=1.
+
 =head1 CAVEAT
 
 We use dynamically-generated DBIx::Class classes.  This technique does not scale well for very large numbers
