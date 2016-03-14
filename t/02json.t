@@ -13,14 +13,13 @@ use lib "$testdir/blah/lib";
 
 my $t = Test::Mojo->new('Blah');
 
-$t->get_ok('/'                      => 'App starts');
+$t->get_ok('/'                         => 'App starts');
 
-$t->get_ok('/tables/artist.json'    => 'Artist json query succeeds');
+$t->get_ok('/tables/artist/1/cds.json' => 'Artist child ("CDs") json query succeeds');
 
 #note "GOT",  explain $t->tx->res->json;
 
-$t->json_has('/data'                => 'json response has data');
-$t->json_is ('/data/1/name', 'Michael Jackson',
-                                    => 'data includes Michael Jackson');
+$t->json_has('/1/label'                => 'json response has "label" field');
+$t->json_is ('/1/label', '[Cd] 2'      => 'label is "[Cd 2]"');
 
 done_testing();
