@@ -35,10 +35,12 @@ sub register {
     });
 
     $app->config(default_theme=>'redmond');
-    $app->defaults(layout=>'tables');
+    $app->defaults(layout => $conf->{layout} || 'tables');
 
     my $model_class = $conf->{model_class} ||= 'Mojolicious::Plugin::Tables::Model';
-    my $model       = $model_class->setup($conf);
+    eval "require $model_class";
+
+    my $model = $model_class->setup($conf);
     $model_class->log($log);
     $app->config(model=>$model);
 
@@ -177,141 +179,41 @@ copying the distribution templates from ../Plugin/Tables/resources/templates int
 
     $self->plugin(Tables => { model_class => 'MyDB' } );
 
-Where model_class implements the specification given below.  This lets you start to customise and grow your web app.
-
-=head1 Customising model_class
-
 Prepare your own model_class to override the default database settings which "Tables" has determined from the 
 database.  This class (and its per-table descendants) can be within or without your Mojolicious application.
+C<model_class> implements the specification given in L<Mojolicious::Plugin::Tables::Model>.
+This lets you start to customise and grow your web app.
 
-=head2 model_class PARENT
+=head1 CONFIGURATION
 
-Your model_class must inherit from Mojolicious::Plugin::Tables::Model.  So, e.g.
+    $app->plugin(Tables => $conf) 
 
-    package StuffDB;
+Where the full list of configuration options is:
 
-    use strict;
-    use warnings;
+=head3 layout
 
-    use base qw/Mojolicious::Plugin::Tables::Model/;
+Provide an alternative 'wrapper' layout; typically the one from your own application.  If you prepare one of these you will need
+to include most of the layout arrangements in the Day-One layout, i.e. the one at resources/templates/layouts/tables.html.ep.
+The easiest approach is to start by copying the packaged version into your own application and then change its look and feel to
+suit your requirements.
 
-    ...
+=head3 nohome
 
-=head2 model_class METHODS
+Unless you supply a true value for this, an automatic redirection will be in place from the root of your app to the '/tables' path.
+The redirection is there to make day-one functionality easy to find, but once your app grows you will not want this redirection.
 
-Your model_class optionally overrides any of the following methods.
+=head3 model_class
+
+See 'Customising Model Class'
 
 =head3 connect_info
 
-A sub returning an arrayref supplying your locally declared DBI parameters. e.g.
+See 'Day One'
 
-    sub connect_info { [ 'dbi:Pg:dbname="stuff"', '', '' ] }
+=head3 default_theme
 
-which works for a Postgres database called 'stuff' accepting IDENT credentials.
-
-=head3 glossary
-
-A sub returning a hashref which maps "syllables" to displaynames.  "Syllables" are all the abbreviated words that
-are separated by underscores in your database table and column names.  Any syllable by default is made into a nice
-word by simply init-capping it, so the glossary only needs to supply non-obvious displaynames.
-The mapping 'id=>Identifier' is built-in.
-So for example with table or column names such as "stock", "active_stock", "stock_id", "stock_name",
-"dyngrp_id", "mkt_ldr", "ccld_ts" we would supply just this
-
-    sub glossary { +{
-        ccld   => 'Cancelled',
-        dyngrp => 'Dynamic Group',
-        mkt    => 'Market',
-        ldr    => 'Leader',
-        ts     => 'Timestamp',
-    } }
-
-.. and we will see labels "Stock", "Active Stock", "Stock Identifier", "Stock Name",
-"Dynamic Group Identifier", "Market Leader", "Cancelled Timestamp" in the generated application.
- 
-=head3 input_attrs
-
-A sub returning a hashref giving appropriate html5 form-input tag attributes for any fieldname.  By default these
-attributes are derived depending on field type and database length. But these can be overriden here, e.g.
-
-    sub input_attrs { +{
-        var_pct => { min=>-100, max=>100 },
-        vol_pct => { min=>-100, max=>500 },
-        name    => { size=>80 },
-        picture => { size=>80, type=>'url' },
-        email   => { size=>40, type=>'email' },
-        email_verified => { type=>'checkbox' },
-        ts      => { step=>1 },
-    } }
-
-=head3 rel_name_map
-
-A sub returning a hashref which maps default generated relationship names to more appropriate choices.  More detail
-in L<DBIx::Class::Schema::Loader>.  e.g.
-
-    sub rel_name_map { +{
-        AssetRange => { range_age => 'range' },
-        Asset      => { symbol    => 'lse_security' },
-        Dyngrp     => { dyngrps   => 'subgroups' },
-        Trader     => { authority_granters => 'grants_to',
-                        authority_traders  => 'audit_trail' },
-    } }
-
-=head2 ResultClass Methods
-
-After creating a model_class as described above you will automatically be able to introduce 'ResultClass' classes
-for any of the tables in your database.  Place these directly 'under' your model_class, e.g. if StuffDB is
-your model_class and you want to introduce a nice stringify rule for the table 'asset', then you can
-create the class StuffDB::Asset and give it just the stringify method. e.g. from http://octalfutures.com :
-
-    package StuffDB::Asset;
-
-    use strict;
-    use warnings;
-
-    sub stringify {
-        my $self = shift;
-        my $latest_str = '';
-        if (my $latest = $self->latest) {
-            $latest_str = " $latest";
-            if (my $var_pct = $self->var_pct) {
-                $latest_str .= sprintf ' (%+.2f%%)', $var_pct
-            }
-        }
-        return sprintf '%s (%s)%s', $self->name, $self->dataset_code, $latest_str
-    }
-
-    1;
-
-Any of these ResultClasses will inherit all methods of DBIx::Class::Row.
-In addition these methods inherit all methods of Mojolicious::Plugin::Tables::Model::Row, namely:
-
-=head3 stringify
-
-It's recommended to implement this.  The stringification logic for this table.  The default implementation 
-tries to use any columns such as 'cd' or 'description', and falls back to joining the primary keys.
-
-=head3 present
-
-Generate a presentation of a row->column value, formatted depending on type.  Args: column_name, a hash-ref containing schema info about that column, and a hashref containing context info (currently just 'foredit=>1').
-
-=head3 options
-
-Given: column_name, a hash-ref containing schema info about that column, a hash-ref containing info about the parent table, the full DBIX::Class schema, and a hash-ref containing schema information about all tables..
-
-Generate the full pick-list that lets the fk $column pick from its parent,
-in a structure suitable for the Mojolicious 'select_field' tag.  The default version simply lists all choices
-(limited by safety row-count of 200) but inherited versions are expected to do more
-context-sensitive filtering.  Works as a class method to support the 'add' context.
-
-=head3 nuke
-
-Perform full depth-wise destruction of a database record.  The default implementation runs an alghorithm to delete
-all child records and finally delete $self.  Override this to prohibit (by dieing) or perform additional work.
-
-=head3 all the rest
-
-Of course, all the methods described at L<DBIx::Class::Row> can be overriden here.
+To experiment with completely different colour themes, choose any standard JQueryUI theme name or "roll" your own as described here 
+L<http://jqueryui.com/themeroller/>.   Our default is 'Redmond'.
 
 =head1 DEBUGGING
 
@@ -335,6 +237,6 @@ This program is free software, you can redistribute it and/or modify it under th
 
 =head1 SEE ALSO
 
-L<Mojolicious>, L<DBIx::Class::Schema::Loader>, L<Mojolicious::Guides>, L<http://mojolicious.org>.
+L<Mojolicious>, L<DBIx::Class::Schema::Loader>, L<Mojolicious::Plugin::Tables::Model>
 
 =cut
