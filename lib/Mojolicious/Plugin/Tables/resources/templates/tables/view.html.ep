@@ -108,6 +108,7 @@
                     % }
                 % end
             % }
+        %= include 'view_extra_100'
         % end
 
         % if (my $child = stash('child')) {
