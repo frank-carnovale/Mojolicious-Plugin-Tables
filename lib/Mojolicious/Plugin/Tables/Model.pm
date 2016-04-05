@@ -7,7 +7,7 @@ use base qw/DBIx::Class::Schema::Loader/;
 
 use Data::Dumper;
 
-__PACKAGE__->mk_group_accessors(inherited => qw/log connect_info/);
+__PACKAGE__->mk_group_accessors(inherited => qw/log connect_info model/);
 
 sub glossary { +{ id => 'Identifier' } }
 
@@ -61,11 +61,12 @@ sub setup {
     $class->naming('v8');
     $class->use_namespaces(0);
     $class->connection( @{$class->connect_info} );
-    return $class->model;
+    $class->model($class->_model);
 }
 
-sub model {
+sub _model {
     my $schema  = shift;
+
     my @tablist = ();
     my %bytable = ();
     #my $log     = $schema->log;
@@ -139,7 +140,7 @@ sub model {
         push @tablist, $s->name;
         $bytable{$s->name} = $tabinfo;
     }
-    {schema=>$schema, tablist=>\@tablist, bytable=>\%bytable}
+    return {schema=>$schema, tablist=>\@tablist, bytable=>\%bytable};
 }
 
 1;

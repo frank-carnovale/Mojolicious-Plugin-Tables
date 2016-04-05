@@ -38,10 +38,11 @@ sub register {
     $app->defaults(layout => $conf->{layout} || 'tables');
 
     my $model_class = $conf->{model_class} ||= 'Mojolicious::Plugin::Tables::Model';
-    eval "require $model_class";
+    eval "require $model_class" or die;
 
-    my $model = $model_class->setup($conf);
     $model_class->log($log);
+    $model_class->setup($conf);
+    my $model = $model_class->model;
     $app->config(model=>$model);
 
     my $plugin_resources = catdir dirname(__FILE__), 'Tables', 'resources';
