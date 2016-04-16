@@ -1,6 +1,5 @@
 package Blah;
 use Mojo::Base 'Mojolicious';
-use StuffDB;
 
 sub startup {
   my $self = shift;
