@@ -8,8 +8,6 @@ use overload
     'bool'   => sub { 1 },
     fallback => 1;
 
-use base 'DBIx::Class::Core';
-
 # errors during stringification of a db object can sometimes trigger 
 # deep recursion by well-meaning error messages deep in ORM internals.
 
@@ -97,8 +95,6 @@ sub nuke {
         ++$i
     } )
 }
-
-__PACKAGE__->load_components('InflateColumn::DateTime');
 
 1;
 
