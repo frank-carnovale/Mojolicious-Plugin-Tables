@@ -3,11 +3,39 @@ package Mojolicious::Plugin::Tables::Model;
 use strict;
 use warnings;
 
-use base qw/DBIx::Class::Schema::Loader/;
+use base qw/DBIx::Class::Schema/;
+use DBIx::Class::Schema::Loader::Dynamic;
 
-use Data::Dumper;
+__PACKAGE__->mk_group_accessors(inherited => qw/log model/);
 
-__PACKAGE__->mk_group_accessors(inherited => qw/log connect_info model/);
+sub setup {
+    my ($class, $conf) = @_;
+    if (my $connect_info = $conf->{connect_info}) {
+        $class->connect_info($connect_info)
+    } else {
+        die "Provide connect_info either as a config value or an override"
+            unless $class->connect_info
+    }
+
+    # to return a schema object-ref here say 'connect' instead of 'connection'.
+    my $schema = $class->connection(@{$class->connect_info});
+
+    DBIx::Class::Schema::Loader::Dynamic->new(
+        left_base_classes   => $class->row_base,
+        rel_name_map        => $class->rel_name_map,
+        custom_column_info  => sub { $class->custom_column_info(@_) },
+        naming              => 'v8',
+        use_namespaces      => 0,
+        schema              => $schema,
+        %{$conf->{loader_opts}||{}},
+    )->load;
+
+    $schema->model($schema->_model);
+
+    return $schema;
+}
+
+sub row_base { 'Mojolicious::Plugin::Tables::Model::Row' }
 
 sub glossary { +{ id => 'Identifier' } }
 
@@ -41,28 +69,6 @@ sub custom_column_info {
 };
 
 sub rel_name_map { +{} }
-
-sub setup {
-    my ($class, $conf) = @_;
-    if (my $connect_info = $conf->{connect_info}) {
-        $class->connect_info($connect_info)
-    } else {
-        die "Provide connect_info either as a config value or an override"
-            unless $class->connect_info
-    }
-
-    $class->loader_options(
-        components              => qw[ InflateColumn::DateTime ],
-        additional_base_classes => qw[ Mojolicious::Plugin::Tables::Model::Row ],
-        rel_name_map            => $class->rel_name_map,
-        custom_column_info      => sub { $class->custom_column_info(@_) },
-    );
-
-    $class->naming('v8');
-    $class->use_namespaces(0);
-    $class->connection( @{$class->connect_info} );
-    $class->model($class->_model);
-}
 
 sub _model {
     my $schema  = shift;
@@ -106,7 +112,6 @@ sub _model {
                 }
             } else {
                 warn __PACKAGE__." model: $source: $rel: strange cardinality: $card\n";
-                warn "rel_info " . Dumper($info);
             }
         }
         my %bycolumn = map {

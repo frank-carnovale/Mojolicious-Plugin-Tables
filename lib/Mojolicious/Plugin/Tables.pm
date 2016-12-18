@@ -41,8 +41,8 @@ sub register {
     eval "require $model_class" or die;
 
     $model_class->log($log);
-    $model_class->setup($conf);
-    my $model = $model_class->model;
+    my $schema = $model_class->setup($conf);
+    my $model = $schema->model;
     $app->config(model=>$model);
 
     my $plugin_resources = catdir dirname(__FILE__), 'Tables', 'resources';
