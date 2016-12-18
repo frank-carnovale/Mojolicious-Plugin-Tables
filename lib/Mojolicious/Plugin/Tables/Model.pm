@@ -6,7 +6,7 @@ use warnings;
 use base qw/DBIx::Class::Schema/;
 use DBIx::Class::Schema::Loader::Dynamic;
 
-__PACKAGE__->mk_group_accessors(inherited => qw/log model/);
+__PACKAGE__->mk_group_accessors(inherited => qw/log connect_info model/);
 
 sub setup {
     my ($class, $conf) = @_;
