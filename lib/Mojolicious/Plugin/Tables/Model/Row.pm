@@ -3,6 +3,10 @@ package Mojolicious::Plugin::Tables::Model::Row;
 use strict;
 use warnings;
 
+use base 'DBIx::Class::Core';
+
+__PACKAGE__-> load_components('InflateColumn::DateTime');
+
 use overload
     '""'     => sub { shift->stringify_safely },
     'bool'   => sub { 1 },

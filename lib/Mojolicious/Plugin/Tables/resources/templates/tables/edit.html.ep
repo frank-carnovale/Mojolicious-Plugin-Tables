@@ -9,14 +9,15 @@
 % my $tinfo    = $bytable->{$table};
 % my $id       = shipped('id');
 % my $dml_mode = stash('dml_mode') || 'edit';
-% my $save_url = $dml_mode eq 'edit'
+% my $editing  = $dml_mode eq 'edit';
+% my $save_url = $editing
 %                    ? url_for("/tables/$table/$id/save")
 %                    : url_for("/tables/$table/save"    );
 
 % title $tinfo->{label};
 
 % my $edit_buts = begin
-    % my $act = $dml_mode eq 'edit'? 'view': 'list';
+    % my $act = $editing? 'view': 'list';
     %= t div => (class=>"stats navigators right") => begin
         %= t button => (class=>"button save", 'data-icon1'=>'ui-icon-check')      => 'Save'
         %= t button => (class=>"button $act", 'data-icon1'=>'ui-icon-closethick') => 'Cancel'
@@ -37,12 +38,12 @@
     <div class="pad12">
         %= form_for $save_url => (method=>'post') => begin
             %= t div => (class=>"ui-helper-clearfix") => begin
-                %= t h2 => (class=>"left no-tb-margin") => "$row"
+                %= t h2 => (class=>"left no-tb-margin") => $editing? "$row": "New $table"
                 %= $edit_buts->();
             % end
 
             %= t fieldset => begin
-                %= t legend => "EDIT"
+                %= t legend => $dml_mode
                 %= include 'tables/dml', table=>$table, tinfo=>$tinfo, dml_mode=>$dml_mode
             % end
 
