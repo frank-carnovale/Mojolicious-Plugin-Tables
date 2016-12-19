@@ -27,9 +27,12 @@ Building a distribution
 ```
 # (bump VERSION)
 perl Makefile.PL
+git rm *Tables*tar.gz
 make test
 make manifest
 make dist
 mojo cpanify -u USER -p PASS *Tables*tar.gz
+git add *Tables*tar.gz
+git commit -m 'Build version X.YY'
 # (git push)
 ```

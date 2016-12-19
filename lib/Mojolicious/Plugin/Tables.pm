@@ -6,7 +6,7 @@ use File::Spec::Functions 'catdir';
 
 use Mojolicious::Plugin::Tables::Model;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub register {
     my ($self, $app, $conf) = @_;
