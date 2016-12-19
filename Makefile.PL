@@ -10,6 +10,8 @@ WriteMakefile(
   AUTHOR       => 'Frank Carnovale <frankc@cpan.org>',
   LICENSE      => 'artistic_2',
   PREREQ_PM    => {'Mojolicious' => '6.44',
+                   'DBIx::Class::Core' => 0,
+                   'DBIx::Class::Schema' => 0,
                    'DBIx::Class::Schema::Loader' => '0.07045',
                    'DBIx::Class::Schema::Loader::Dynamic' => '1.05' },
   EXE_FILES    => ['bin/tables'],
