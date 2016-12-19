@@ -25,9 +25,11 @@ and browse to localhost:3000.
 Building a distribution
 -----------------------
 ```
+# (bump VERSION)
 perl Makefile.PL
 make test
 make manifest
 make dist
 mojo cpanify -u USER -p PASS *Tables*tar.gz
+# (git push)
 ```
