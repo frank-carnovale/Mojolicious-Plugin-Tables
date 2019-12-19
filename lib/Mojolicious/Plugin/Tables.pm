@@ -50,7 +50,8 @@ sub register {
         # Move first part and slash from path to base path when deployed under a path
         if ($c->req->headers->header('X-Request-Base')) {
             my $part0 = shift @{$c->req->url->path->leading_slash(0)};
-                         push @{$c->req->url->base->path->trailing_slash(0)}, $part0;
+            push @{$c->req->url->base->path->trailing_slash(0)}, $part0;
+            $c->shipped(urlbase => $c->req->url->base);
         }
         # capture https into base
         if ($c->req->headers->header('X-Forwarded-HTTPS')
