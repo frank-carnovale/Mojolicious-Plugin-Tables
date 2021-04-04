@@ -1,3 +1,15 @@
+commit 808a137f0fcbdf025ccdb7e9c65f6b3c969bee97
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Apr 4 12:09:47 2021 +0100
+
+    support new Mojolicious backward-breaking "format" rules
+
+commit 8b43a4bc86a0fde297588636a5b01d1af03312eb
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sat May 16 12:53:25 2020 +0100
+
+    Built version 1.05
+
 commit 9b1b03c97bf3282ca02650dac922576d479bd590
 Author: Frank Carnovale <frank.carnovale@gmail.com>
 Date:   Sat May 16 12:52:14 2020 +0100
