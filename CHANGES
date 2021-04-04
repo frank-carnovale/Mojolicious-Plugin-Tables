@@ -1,3 +1,21 @@
+commit 28e3529e25d7bdc4c926dcd988696881e396b015
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Apr 4 12:27:26 2021 +0100
+
+    Build version 1.07
+
+commit 523b62a6f21c177c092321d4316b51909d1e57a0
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Apr 4 12:22:55 2021 +0100
+
+    fix build instructions
+
+commit b4694899648b6208d641b0048d0ec2ffd252a236
+Author: Frank Carnovale <frank.carnovale@gmail.com>
+Date:   Sun Apr 4 12:12:50 2021 +0100
+
+    Built version 1.06
+
 commit 808a137f0fcbdf025ccdb7e9c65f6b3c969bee97
 Author: Frank Carnovale <frank.carnovale@gmail.com>
 Date:   Sun Apr 4 12:09:47 2021 +0100
