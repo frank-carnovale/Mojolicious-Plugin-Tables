@@ -25,13 +25,16 @@ and browse to localhost:3000.
 Building a distribution
 -----------------------
 ```
+ # (first ensure new work committed, then..)
+
  rm *Tables*tar.gz
 
  # (bump VERSION in lib/Mojolicious/Plugin/Tables.pm)
  git add            lib/Mojolicious/Plugin/Tables.pm
+ git commit -m 'Build version X.YY'
  git log >CHANGES
  git add CHANGES
- git commit -m 'Build version X.YY'
+ git commit -m 'Built version X.YY'
  # (git push)
 
  perl Makefile.PL 
